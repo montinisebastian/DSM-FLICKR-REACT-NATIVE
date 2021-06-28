@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import { Text, View,FlatList} from 'react-native';
 import axios from 'axios';
 import AlbumDetail from './AlbumDetail';
 
@@ -36,7 +36,8 @@ class AlbumList extends Component {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView>{this.renderAlbums()}</ScrollView>
+        <FlatList data={photos.photoset}
+        renderItem={({item}) => renderAlbums(item)}/>
       </View>
     );
   }
