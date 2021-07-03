@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 import axios from 'axios';
 import PhotoDetail from './PhotoDetail';
 
@@ -9,17 +9,14 @@ const PhotoList = (props) =>
 
   const [state, setState] = useState({photos: null});
   const addPhotos = (e) => setState(e);
-  const renderAlbums = () => 
-  {
-    return state.photos.map((photo) => 
-    (
-      <PhotoDetail
+  const renderAlbum = (photo) => {
+    return <PhotoDetail
         key={photo.title}
         title={photo.title}
         imageUrl={`https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg`}
-      />
-    )
-    );
+      />;
+    
+    
   }
   console.log(state);
 
@@ -41,6 +38,11 @@ const PhotoList = (props) =>
       </View>
     );
   }
-}
 
-export default PhotoList;
+return (
+  <View style={{flex: 1}}>
+    <FlatList data={state.photos}
+    renderItem={({item}) => renderAlbum(item)}/>
+  </View>
+);
+}
