@@ -4,32 +4,35 @@ import axios from 'axios';
 import PhotoDetail from './PhotoDetail';
 
 
-const PhotoList = (props) => 
+const PhotoList = ({route}) => 
 {
 
   const [state, setState] = useState({photos: null});
-  const addPhotos = (e) => setState(e);
-  const renderAlbum = (photo) => {
-    return <PhotoDetail
-        key={photo.title}
-        title={photo.title}
-        imageUrl={`https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg`}
-      />;
-    
-    
-  }
+  
+  
   console.log(state);
 
   useEffect( () => 
   {
-    axios
-    .get(
-      `https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=6e8a597cb502b7b95dbd46a46e25db8d&photoset_id=${props.route.params.albumId}&user_id=137290658%40N08&format=json&nojsoncallback=1`,
-    )
-    .then((response) =>
-      addPhotos({photos: response.data.photoset.photo}),
-    );
+    const fetchPhotos = async () => {
+      const {data} = await axios
+      .get(
+        `https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=6e8a597cb502b7b95dbd46a46e25db8d&photoset_id=${route.params.albumId}&user_id=137290658%40N08&format=json&nojsoncallback=1`,
+      );
+      setState(data.photoset.photo)
+    }
+    fetchPhotos();
+    
   }, []);
+
+  const renderPhotos = ({photo}) => (
+    <PhotoDetail
+       key={photo.title}
+       title={photo.title}
+       imageUrl={`https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg`}
+     />
+ )
+ 
   if (!state.photos) 
   {
     return (
@@ -41,8 +44,11 @@ const PhotoList = (props) =>
 
 return (
   <View style={{flex: 1}}>
-    <FlatList data={state.photos}
-    renderItem={({item}) => renderAlbum(item)}/>
+    <FlatList 
+    data={state.photos}
+    renderItem={renderPhotos}/>
   </View>
 );
 }
+
+export default PhotoList;

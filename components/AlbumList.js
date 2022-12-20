@@ -1,46 +1,44 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text, View,FlatList} from 'react-native';
 import axios from 'axios';
 import AlbumDetail from './AlbumDetail';
 
-class AlbumList extends Component {
-  state = {photoset: null};
+const AlbumList = ({navigation}) =>{
 
-  componentWillMount() {
-    axios
-      .get(
-        'https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key=6e8a597cb502b7b95dbd46a46e25db8d&user_id=137290658%40N08&format=json&nojsoncallback=1',
-      )
-      .then((response) =>
-        this.setState({photoset: response.data.photosets.photoset}),
-      );
-  }
+  const [photoset, setPhotoset] = useState(null);
 
-  renderAlbums() {
-    return this.state.photoset.map((album) => (
+  useEffect(()=> {
+    const fetchPhotoset = async () =>{
+      const {data} = await axios
+        .get(
+          'https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key=6e8a597cb502b7b95dbd46a46e25db8d&user_id=137290658%40N08&format=json&nojsoncallback=1',
+        );
+        setPhotoset(data.photosets.photoset)
+    }
+      fetchPhotoset();
+  }, []);
+
+  const renderAlbums = ({album}) => (
       <AlbumDetail
-        navigation={this.props.navigation}
+        navigation={navigation}
         key={album.id}
         title={album.title._content}
         albumId={album.id}
       />
-    ));
-  }
+    );
+  
 
-  render() {
-    console.log(this.state);
-
-    if (!this.state.photoset) {
+    if (!photoset) {
       return <Text>Loading...</Text>;
     }
 
     return (
       <View style={{flex: 1}}>
-        <FlatList data={photos.photoset}
-        renderItem={({item}) => renderAlbums(item)}/>
+        <FlatList data={photoset}
+        renderItem={renderAlbums}/>
       </View>
     );
-  }
+  
 }
 
 export default AlbumList;
